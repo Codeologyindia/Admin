@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Login;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MadisonQuaryController;
+use App\Http\Controllers\Admin\AyasmarCardController;
+use App\Http\Controllers\Admin\HospitalController;
+use App\Http\Controllers\Admin\AjaxLocationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,3 +41,35 @@ Route::post('admin/signup', function () {
 
 // Optional: If you want /login to show the admin login form as well
 Route::get('/login', [Login::class, 'showLoginForm'])->name('login');
+
+// Admin Dashboard & Madison Quary
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::get('/admin/madison-quary', [MadisonQuaryController::class, 'index'])->name('admin.madison-quary');
+Route::get('/admin/madison-quary/add', [MadisonQuaryController::class, 'add'])->name('admin.madison-quary.add');
+Route::post('/admin/madison-quary/store', [MadisonQuaryController::class, 'store'])->name('admin.madison-quary.store');
+
+// Edit Madison Quary (loads a separate page, not a modal)
+Route::get('/admin/madison-quary/edit/{id}', [MadisonQuaryController::class, 'edit'])->name('admin.madison-quary.edit');
+Route::post('/admin/madison-quary/update/{id}', [MadisonQuaryController::class, 'update'])->name('admin.madison-quary.update');
+
+// Ayushman Card Query
+Route::get('/admin/ayushman-card-query', [AyasmarCardController::class, 'index'])->name('admin.ayushman-card-query');
+Route::get('/admin/ayushman-card-query/add', [AyasmarCardController::class, 'add'])->name('admin.ayushman-card-query.add');
+Route::post('/admin/ayushman-card-query/store', [AyasmarCardController::class, 'store'])->name('admin.ayushman-card-query.store');
+Route::get('/admin/ayushman-card-query/edit/{id}', [AyasmarCardController::class, 'edit'])->name('admin.ayushman-card-query.edit');
+Route::post('/admin/ayushman-card-query/update/{id}', [AyasmarCardController::class, 'update'])->name('admin.ayushman-card-query.update');
+
+// Hospital Management routes
+Route::get('/admin/hospital', [HospitalController::class, 'index'])->name('admin.hospital');
+Route::get('/admin/hospital/add', [HospitalController::class, 'create'])->name('admin.hospital.add');
+Route::post('/admin/hospital/add', [HospitalController::class, 'store'])->name('admin.hospital.store');
+Route::get('/admin/hospital/edit/{id}', [HospitalController::class, 'edit'])->name('admin.hospital.edit');
+Route::post('/admin/hospital/edit/{id}', [HospitalController::class, 'update'])->name('admin.hospital.update');
+
+// AJAX routes for dynamic State, City, District, Doctor, Hospital, Department
+Route::get('/admin/ajax/states', [AjaxLocationController::class, 'states']);
+Route::get('/admin/ajax/cities', [AjaxLocationController::class, 'cities']);
+Route::get('/admin/ajax/districts', [AjaxLocationController::class, 'districts']);
+Route::get('/admin/ajax/doctors', [AjaxLocationController::class, 'doctors']);
+Route::get('/admin/ajax/hospitals', [AjaxLocationController::class, 'hospitals']);
+Route::get('/admin/ajax/departments', [AjaxLocationController::class, 'departments']);
