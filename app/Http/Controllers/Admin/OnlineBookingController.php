@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\OtherDocument;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel; // Add this if using Laravel Excel
+use Illuminate\Support\Str;
 
 class OnlineBookingController extends Controller
 {
@@ -37,6 +38,33 @@ class OnlineBookingController extends Controller
             'appointment' => 'required',
             // ...add more validation as needed...
         ]);
+
+        // Query Type logic (fix: use correct model import and always create new if "other")
+        $query_type_id = null;
+        if ($request->query_type === 'other' && $request->query_type_other) {
+            $slug = Str::slug($request->query_type_other);
+            $baseSlug = $slug;
+            $i = 1;
+            while (\App\Models\QueryType::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . $i;
+                $i++;
+            }
+            $queryType = new \App\Models\QueryType();
+            $queryType->name = $request->query_type_other;
+            $queryType->slug = $slug;
+            $queryType->save();
+            $query_type_id = $queryType->id;
+        } elseif ($request->query_type && $request->query_type !== 'other') {
+            $queryType = \App\Models\QueryType::where('slug', $request->query_type)->first();
+            if ($queryType) {
+                $query_type_id = $queryType->id;
+            }
+        }
+
+        // Ensure query_type_id is always set (not null)
+        if (!$query_type_id) {
+            return redirect()->back()->withErrors(['query_type' => 'Query For is required.'])->withInput();
+        }
 
         // Insert new state/city/district if provided and not empty
         $state_id = null;
@@ -106,6 +134,7 @@ class OnlineBookingController extends Controller
         $payment_id = $request->input('payment_id') ?? null;
 
         $booking = BookingOnline::create([
+            // ...existing fields...
             'person_name' => $request->person_name,
             'phone' => $request->phone,
             'alternate_number' => $request->alternate_number,
@@ -127,6 +156,7 @@ class OnlineBookingController extends Controller
             'amount' => $amount,
             'paid_amount' => $paid_amount,
             'payment_id' => $payment_id,
+            'query_type_id' => $query_type_id,
         ]);
 
         // Handle document uploads (core PHP, create folder if not exists)
