@@ -213,8 +213,10 @@ CREATE TABLE booking_online (
     amount DECIMAL(10,2) DEFAULT NULL,
     paid_amount DECIMAL(10,2) DEFAULT NULL,
     payment_id VARCHAR(100) DEFAULT NULL,
+    query_type_id INT DEFAULT NULL, -- new column for query type reference
     created_at TIMESTAMP NULL DEFAULT NULL,
-    updated_at TIMESTAMP NULL DEFAULT NULL
+    updated_at TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (query_type_id) REFERENCES query_types(id)
 );
 
 -- Table: booking_payment_logs
