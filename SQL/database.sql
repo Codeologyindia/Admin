@@ -226,3 +226,17 @@ CREATE TABLE booking_payment_logs (
     created_at TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (booking_online_id) REFERENCES booking_online(id)
 );
+
+-- Table: query_types
+CREATE TABLE query_types (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP NULL DEFAULT NULL,
+    updated_at TIMESTAMP NULL DEFAULT NULL
+);
+
+-- Insert default query types
+INSERT INTO query_types (name, slug, created_at) VALUES
+('Madison Related', 'madison', NOW()),
+('Ayushman Card Related', 'ayushman', NOW());

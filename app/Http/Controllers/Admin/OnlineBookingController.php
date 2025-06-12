@@ -21,7 +21,8 @@ class OnlineBookingController extends Controller
     {
         $hospitals = Hospital::all();
         $departments = Department::all();
-        return view('admin.online-booking', compact('hospitals', 'departments'));
+        $queryTypes = \App\Models\QueryType::orderBy('id')->get();
+        return view('admin.online-booking', compact('hospitals', 'departments', 'queryTypes'));
     }
 
     public function store(Request $request)

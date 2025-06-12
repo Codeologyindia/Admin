@@ -45,8 +45,9 @@
                                 <label class="form-label fw-semibold">Query For <span class="text-danger">*</span></label>
                                 <select name="query_type" id="query_type_select" class="form-select" required>
                                     <option value="">Select</option>
-                                    <option value="madison">Madison Related</option>
-                                    <option value="ayushman">Ayushman Card Related</option>
+                                    @foreach($queryTypes as $qt)
+                                        <option value="{{ $qt->slug }}">{{ $qt->name }}</option>
+                                    @endforeach
                                     <option value="other">Other</option>
                                 </select>
                             </div>
