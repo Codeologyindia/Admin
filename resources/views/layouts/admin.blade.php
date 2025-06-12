@@ -260,7 +260,13 @@
             </div>
             <div class="info">
                 <div class="name">{{ Auth::user()->email ?? 'Admin' }}</div>
-                <div class="role">{{ optional(Auth::user()->rol)->name ?? 'Admin' }}</div>
+                <div class="role">
+                    @if(Auth::check() && Auth::user()->rol)
+                        {{ Auth::user()->rol->name }}
+                    @else
+                        Admin
+                    @endif
+                </div>
             </div>
         </div>
         <div class="nav-section-title">Main</div>
@@ -269,6 +275,17 @@
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
         </nav>
+
+        <div class="nav-section-title">Online Booking</div>
+        <nav class="nav flex-column">
+            <a class="nav-link {{ request()->routeIs('admin.online-booking') ? 'active' : '' }}" href="{{ route('admin.online-booking') }}">
+                <i class="bi bi-calendar-check"></i> New Booking
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.booking-list') ? 'active' : '' }}" href="{{ route('admin.booking-list') }}">
+                <i class="bi bi-list-check"></i> All Bookings
+            </a>
+        </nav>
+
         <div class="nav-section-title">Management</div>
         <nav class="nav flex-column">
             @php
@@ -297,10 +314,6 @@
                 <a class="nav-link {{ request()->routeIs('admin.hospital.add') ? 'active' : '' }}" href="{{ route('admin.hospital.add') }}">
                     <i class="bi bi-plus-lg"></i> Add Hospital
                 </a>
-                {{-- Example for future: Departments --}}
-                {{-- <a class="nav-link" href="#">
-                    <i class="bi bi-building"></i> Departments
-                </a> --}}
             </div>
             <a class="nav-link" href="#">
                 <i class="bi bi-people"></i> Users

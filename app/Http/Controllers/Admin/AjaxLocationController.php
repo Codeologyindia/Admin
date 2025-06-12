@@ -14,34 +14,80 @@ class AjaxLocationController extends Controller
     public function states(Request $request)
     {
         $q = $request->input('q');
+        $selectedId = $request->input('selected_id');
         $query = State::query();
+
+        // Always include selected option if present
+        $states = collect();
+        if ($selectedId) {
+            $selected = State::where('id', $selectedId)->select('id', 'name')->first();
+            if ($selected) {
+                $states->push($selected);
+            }
+        }
+
         if ($q && strlen($q) >= 3) {
             $query->where('name', 'like', '%' . $q . '%');
+            if ($selectedId) {
+                $query->where('id', '!=', $selectedId);
+            }
+            $results = $query->select('id', 'name')->orderBy('name')->limit(10)->get();
+            $states = $states->concat($results);
         }
-        $states = $query->select('id', 'name')->orderBy('name')->limit(10)->get();
-        return response()->json($states);
+
+        return response()->json($states->values());
     }
 
     public function cities(Request $request)
     {
         $q = $request->input('q');
+        $selectedId = $request->input('selected_id');
         $query = City::query();
+
+        $cities = collect();
+        if ($selectedId) {
+            $selected = City::where('id', $selectedId)->select('id', 'name')->first();
+            if ($selected) {
+                $cities->push($selected);
+            }
+        }
+
         if ($q && strlen($q) >= 3) {
             $query->where('name', 'like', '%' . $q . '%');
+            if ($selectedId) {
+                $query->where('id', '!=', $selectedId);
+            }
+            $results = $query->select('id', 'name')->orderBy('name')->limit(10)->get();
+            $cities = $cities->concat($results);
         }
-        $cities = $query->select('id', 'name')->orderBy('name')->limit(10)->get();
-        return response()->json($cities);
+
+        return response()->json($cities->values());
     }
 
     public function districts(Request $request)
     {
         $q = $request->input('q');
+        $selectedId = $request->input('selected_id');
         $query = District::query();
+
+        $districts = collect();
+        if ($selectedId) {
+            $selected = District::where('id', $selectedId)->select('id', 'name')->first();
+            if ($selected) {
+                $districts->push($selected);
+            }
+        }
+
         if ($q && strlen($q) >= 3) {
             $query->where('name', 'like', '%' . $q . '%');
+            if ($selectedId) {
+                $query->where('id', '!=', $selectedId);
+            }
+            $results = $query->select('id', 'name')->orderBy('name')->limit(10)->get();
+            $districts = $districts->concat($results);
         }
-        $districts = $query->select('id', 'name')->orderBy('name')->limit(10)->get();
-        return response()->json($districts);
+
+        return response()->json($districts->values());
     }
 
     public function doctors(Request $request)

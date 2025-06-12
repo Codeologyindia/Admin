@@ -10,7 +10,7 @@
             <div class="card shadow-sm border-0" style="border-radius:0;">
                 <div class="card-body p-4">
                     <h3 class="fw-bold mb-4 text-center" style="color:#232946;">Add Madison Quary</h3>
-                    <form method="POST" action="#">
+                    <form id="madisonQuaryForm" method="POST" action="{{ route('admin.madison-quary.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-3">
                             <style>
@@ -181,6 +181,7 @@
                                             <label class="form-label">Doctor Name</label>
                                             <select name="doctor_name[]" class="form-select" multiple id="doctorSelect" onchange="handleOtherInput(this, 'doctorOtherInput')">
                                                 {{-- Options will be loaded dynamically via AJAX --}}
+                                                <option value="Other">Other</option>
                                             </select>
                                             <input type="text" name="doctor_other" id="doctorOtherInput" class="form-control mt-2" placeholder="Please specify other doctor" style="display:none;">
                                         </div>
@@ -188,6 +189,7 @@
                                             <label class="form-label">Hospital/Clinic Name</label>
                                             <select name="hospital_name[]" class="form-select" multiple id="hospitalSelect" onchange="handleOtherInput(this, 'hospitalOtherInput')">
                                                 {{-- Options will be loaded dynamically via AJAX --}}
+                                                <option value="Other">Other</option>
                                             </select>
                                             <input type="text" name="hospital_other" id="hospitalOtherInput" class="form-control mt-2" placeholder="Please specify other hospital/clinic" style="display:none;">
                                         </div>
@@ -195,6 +197,7 @@
                                             <label class="form-label">Department</label>
                                             <select name="department[]" class="form-select" multiple id="departmentSelect" onchange="handleOtherInput(this, 'departmentOtherInput')">
                                                 {{-- Options will be loaded dynamically via AJAX --}}
+                                                <option value="Other">Other</option>
                                             </select>
                                             <input type="text" name="department_other" id="departmentOtherInput" class="form-control mt-2" placeholder="Please specify other department" style="display:none;">
                                         </div>
@@ -211,24 +214,30 @@
                                     <div class="row g-3 align-items-end">
                                         <div class="col-md-4">
                                             <label class="form-label">State</label>
-                                            <select name="state" id="stateSelect" class="form-select">
+                                            <select name="state" id="stateSelect" class="form-select" onchange="handleOtherInput(this, 'stateOtherInput')">
                                                 <option value="">Select state</option>
                                                 {{-- Dynamically loaded --}}
+                                                <option value="Other">Other</option>
                                             </select>
+                                            <input type="text" name="state_other" id="stateOtherInput" class="form-control mt-2" placeholder="Please specify other state" style="display:none;">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">City</label>
-                                            <select name="city" id="citySelect" class="form-select">
+                                            <select name="city" id="citySelect" class="form-select" onchange="handleOtherInput(this, 'cityOtherInput')">
                                                 <option value="">Select city</option>
                                                 {{-- Dynamically loaded --}}
+                                                <option value="Other">Other</option>
                                             </select>
+                                            <input type="text" name="city_other" id="cityOtherInput" class="form-control mt-2" placeholder="Please specify other city" style="display:none;">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">District</label>
-                                            <select name="district" id="districtSelect" class="form-select">
+                                            <select name="district" id="districtSelect" class="form-select" onchange="handleOtherInput(this, 'districtOtherInput')">
                                                 <option value="">Select district</option>
                                                 {{-- Dynamically loaded --}}
+                                                <option value="Other">Other</option>
                                             </select>
+                                            <input type="text" name="district_other" id="districtOtherInput" class="form-control mt-2" placeholder="Please specify other district" style="display:none;">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Village</label>
@@ -258,12 +267,36 @@
                                             <input type="text" name="aadhaar_number" class="form-control" placeholder="Enter Aadhaar number">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Other Document</label>
-                                            <input type="text" name="other_document" class="form-control" placeholder="Enter other document details">
+                                            <label class="form-label">Other Documents</label>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-normal text-secondary">Add supporting documents (if any):</span>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" id="addDocumentBtn">
+                                                    <i class="bi bi-plus-circle"></i> Add Document
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Madison Upload</label>
                                             <input type="file" name="madison_upload" class="form-control">
+                                        </div>
+                                        <div class="col-12">
+                                            <div id="otherDocumentsWrapper" class="mt-2">
+                                                <div class="other-document-row p-3 mb-2 border rounded bg-light position-relative">
+                                                    <div class="row g-2">
+                                                        <div class="col-md-6">
+                                                            <input type="text" name="other_document_names[]" class="form-control" placeholder="Document name">
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <input type="file" name="other_documents[]" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-1 d-flex align-items-center justify-content-end">
+                                                            <button type="button" class="btn btn-danger btn-sm remove-document-btn" style="display:none;">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -329,8 +362,20 @@ function showStep(step) {
 }
 
 $(document).ready(function () {
-    // Dynamic Choices.js for Doctor, Hospital, Department
+    // --- FIX: Prevent double-initialization of Choices.js for all selects ---
+
+    // Store Choices instances globally
+    window._choicesInstances = {};
+
+    function destroyChoicesInstance(selectId) {
+        if (window._choicesInstances[selectId]) {
+            window._choicesInstances[selectId].destroy();
+            window._choicesInstances[selectId] = null;
+        }
+    }
+
     function setupAjaxChoices(selectId, url, extraDataFn, isMultiple = false) {
+        destroyChoicesInstance(selectId);
         var select = document.getElementById(selectId);
         var choicesInstance = new Choices(select, {
             searchEnabled: true,
@@ -344,6 +389,7 @@ $(document).ready(function () {
             addItems: false,
             maxItemCount: isMultiple ? -1 : 1
         });
+        window._choicesInstances[selectId] = choicesInstance;
 
         select.addEventListener('search', function(e) {
             var value = e.detail.value;
@@ -367,6 +413,14 @@ $(document).ready(function () {
         return choicesInstance;
     }
 
+    // Always destroy before re-initializing
+    destroyChoicesInstance('doctorSelect');
+    destroyChoicesInstance('hospitalSelect');
+    destroyChoicesInstance('departmentSelect');
+    destroyChoicesInstance('stateSelect');
+    destroyChoicesInstance('citySelect');
+    destroyChoicesInstance('districtSelect');
+
     window.doctorChoices = setupAjaxChoices('doctorSelect', '/admin/ajax/doctors', null, true);
     window.hospitalChoices = setupAjaxChoices('hospitalSelect', '/admin/ajax/hospitals', null, true);
     window.departmentChoices = setupAjaxChoices('departmentSelect', '/admin/ajax/departments', null, true);
@@ -379,7 +433,7 @@ $(document).ready(function () {
         return { state_id: $('#stateSelect').val(), city_id: $('#citySelect').val() };
     });
 
-    // Attach change event for all three selects
+    // Attach change event for all selects needing "Other" input
     $('#doctorSelect').on('change', function() {
         handleOtherInput(this, 'doctorOtherInput');
     });
@@ -389,10 +443,86 @@ $(document).ready(function () {
     $('#departmentSelect').on('change', function() {
         handleOtherInput(this, 'departmentOtherInput');
     });
+    $('#stateSelect').on('change', function() {
+        handleOtherInput(this, 'stateOtherInput');
+    });
+    $('#citySelect').on('change', function() {
+        handleOtherInput(this, 'cityOtherInput');
+    });
+    $('#districtSelect').on('change', function() {
+        handleOtherInput(this, 'districtOtherInput');
+    });
+
+    // Add/Remove Other Document fields
+    $('#addDocumentBtn').on('click', function() {
+        var newRow = `<div class="other-document-row p-3 mb-2 border rounded bg-light position-relative">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <input type="text" name="other_document_names[]" class="form-control" placeholder="Document name">
+                </div>
+                <div class="col-md-5">
+                    <input type="file" name="other_documents[]" class="form-control">
+                </div>
+                <div class="col-md-1 d-flex align-items-center justify-content-end">
+                    <button type="button" class="btn btn-danger btn-sm remove-document-btn">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+        $('#otherDocumentsWrapper').append(newRow);
+        updateRemoveButtons();
+    });
+
+    // Remove document row
+    $(document).on('click', '.remove-document-btn', function() {
+        $(this).closest('.other-document-row').remove();
+        updateRemoveButtons();
+    });
+
+    function updateRemoveButtons() {
+        var rows = $('#otherDocumentsWrapper .other-document-row');
+        rows.find('.remove-document-btn').toggle(rows.length > 1);
+    }
+    updateRemoveButtons();
+
+    $('#madisonQuaryForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = this;
+        var formData = new FormData(form);
+
+        // For Choices.js multi-selects, append selected values manually if needed
+        // Example for doctor_name[]
+        var doctorSelect = document.getElementById('doctorSelect');
+        if (doctorSelect) {
+            var selectedDoctors = Array.from(doctorSelect.selectedOptions).map(opt => opt.value);
+            formData.delete('doctor_name[]');
+            selectedDoctors.forEach(val => formData.append('doctor_name[]', val));
+        }
+        // Repeat for other multi-selects if needed...
+
+        $.ajax({
+            url: $(form).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(resp) {
+                alert('Form submitted! Check console for data.');
+                console.log(resp);
+            },
+            error: function(xhr) {
+                alert('Error submitting form');
+                console.log(xhr.responseText);
+            }
+        });
+    });
 });
 
 function handleOtherInput(select, inputId) {
-    var choices = Array.from(select.selectedOptions).map(opt => opt.value);
+    var choices = Array.isArray(select.selectedOptions)
+        ? Array.from(select.selectedOptions).map(opt => opt.value)
+        : [select.value];
     var otherInput = document.getElementById(inputId);
     if (choices.includes('Other')) {
         otherInput.style.display = '';
